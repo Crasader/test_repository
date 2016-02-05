@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>APP_ID</key>
+	<string>5089</string>
+	<key>SERVER_URL</key>
+	<string>01c2039212f54cebb80526f880beaa11c1fee0f08bcb85e8cb084b8b9557754645</string>
+	<key>APP_SALT</key>
+	<string>f6e3c072cf0a90a843bad85bdabb0a2e9e122c08</string>
+	<key>APP_OPTIONS</key>
+	<string></string>
+	<key>CONVERSION_MODE</key>
+	<string>1</string>
+	<key>ANALYTICS_APP_KEY</key>
+	<string>ee300aaeb0bfdbe402415ff64f6d35defda21ece</string>
+</dict>
+</plist>

@@ -1,0 +1,94 @@
+ストア切替手順
+
+前提として、プロジェクトがiOS側やGooglePlayで申請出来るような状態になっているものとします。
+
+①c++側の変更
+common.hのRAKUTEN_FLGの値を変更する
+
+楽天App市場のAPKを作成:1にする
+GooglePlayのAPKを作成:0にする
+
+
+②java側で不要なファイルを削除する
+
+まずはproj.android/src下を最新の状態にして下さい。
+proj.androidはGooglePlayと楽天App市場のソースが混在している状態になっています。
+
+
+googlePlayに切り替える場合、以下の楽天に関するフォルダ下のファイルを全て削除する
+・src/org/cocos2dx/rakutencpp
+・src/jp/pkga/war/inappbilling/util/rakuten
+・src/jp/co/rakuten/appmarket/billing
+
+楽天App市場に切り替える場合、以下のgoogleに関するフォルダ下のファイルを全て削除する
+・src/org/cocos2dx/cpp
+・src/jp/pkga/war/gcm
+・src/jp/pkga/war/inappbilling/util/google
+・src/com/android/vending/billing
+
+※APK作成終了後は、削除したファイルをマイナスコミットしないようにオーバーライド更新して下さい。
+
+
+
+③マニュフェストファイルを書き換える
+まずはproj.android/AndroidManifest.xmlを最新状態にして下さい。
+GooglePlayの設定を楽天App市場の設定に書き換えるには以下の変更・削除を行ってください
+
+(GooglePlayの設定をバージョン管理対象にして、そのファイルを
+楽天App市場の設定に書き換えるようにすると良いと思いますので、
+楽天App市場の設定のままCommitしないで下さい。)
+
+・変更点①〜③
+
+変更点① 【パッケージ名の変更】
+package="jp.pkga.war"
+→
+package="jp.pkga.war.rakuten"
+
+変更点② 【初期起動のActivityを変更】
+<activity android:name="org.cocos2dx.cpp.AppActivity"
+→
+<activity android:name="org.cocos2dx.rakutencpp.AppActivityForRakuten"
+
+変更点③ 【プロセス間通信の設定】
+<uses-permission android:name="jp.co.rakuten.appmarket.billing.BIND"/>
+→
+<uses-permission android:name="com.android.vending.BILLING"/>
+
+
+・削除箇所①〜④
+文字列等で検索して以下の範囲を削除
+
+削除箇所①: Apsalar設定
+削除箇所②: プッシュ通知用設定1
+削除箇所③: tapjoy設定
+削除箇所④: プッシュ通知用設定2
+
+
+(終)
+--------------------------------------------------------------------------
+(補足)
+GooglePlayのproj.android/src下のソースは楽天のものと混在していても正常にビルド出来るので
+common.hのRAKUTEN_FLGを0にすれば正常にテストできます。
+
+
+各ストアで不要なファイルを退避させるツールtool_stash.shを作成したのでよければ(自己責任の上で)使って下さい
+tool_stash.shファイル序盤の変数は適切に変更して下さい。 
+(2015年6月26日のn-sekineのコミット時は適切に設定されています)
+
+【不要ファイル退避ツールの使用方法】
+ターミナルを立ち上げ以下のコマンドを使用する
+$ cd [workspaceのpath]/war/HMSDocument/RakutenAppMarket 
+$ ./tool_stash.sh
+
+ツールが正常に動いた場合
+1) rakuten_stash    3) google_stash	5) exit
+2) rakuten_restore  4) google_restore
+の選択肢を与えられます
+
+例えばgoogleのapkを作成するときは1)rakuten_stashを使用すると
+楽天に関するファイルを、backupフォルダに全て退避させることが出来ます。
+
+退避させたファイルをbackupフォルダから元の場所に戻すときは
+2)rakuten_restoreを使用して下さい
+
