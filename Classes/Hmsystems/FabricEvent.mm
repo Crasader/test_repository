@@ -5,5 +5,5 @@
 #import <Crashlytics/Crashlytics.h>
 
 void FabricEvent::Login(){
-    [Answers logLoginWithMethod:@"digit" success:@YES customAttributes:@{}];//aaaa
+    [Answers logLoginWithMethod:@"digit" success:@YES customAttributes:@{}];//aaaa　っb
 }
