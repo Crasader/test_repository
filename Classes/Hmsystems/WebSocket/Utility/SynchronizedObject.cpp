@@ -128,7 +128,11 @@ void SynchronizedObject::receive(string type, string value){
 
 SynchronizedObject* SynchronizedObject::clone(json11::Json json,
                                               Synchronizer* synchronizer){
-    MultiValue* value = PrimitiveParser::asMultiValue(json["add_network_args"].string_value());
+    MultiValue* value = nullptr;
+    if (json["add_network_args"].string_value().length() != 0) {
+        value = PrimitiveParser::asMultiValue(json["add_network_args"].string_value());
+    }
+    CCLOG("%s Clone!!", json["object_name"].string_value().c_str());
     return onClone(value, json["id"].string_value(), synchronizer);
 }
 

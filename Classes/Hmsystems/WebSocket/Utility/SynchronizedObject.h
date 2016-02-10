@@ -18,6 +18,10 @@ public:
     std::string getId() const;
     bool isLocal() const;
 protected:
+    const float kDeadTime = 5.0f;
+    const float kSendFps = 30.0f;
+    const float kHeartBeatDuration = 1.0f;
+    
     virtual bool init(bool isLocal, Synchronizer* synchronizer,
                       std::string objectName, std::string id = "");
     
@@ -45,20 +49,17 @@ protected:
     //リモート側の更新処理
     virtual void onRemoteUpdate(float delta) = 0;
     
+    float sendCycle() const;
     std::string _id;
     bool _is_local;
     float _no_message_elapsed_time;
     float _elapsed_time_from_last_send;
     MultiValue* _add_network_args;
     std::string _object_name;
-    const float kDeadTime = 5.0f;
-    const float kSendFps = 30.0f;
-    const float kHeartBeatDuration = 1.0f;
 private:
     void heartBeat(float delta);
     void send(std::string value, std::string type);
     std::string generateId();
-    float sendCycle() const;
     void notifyAlive();
     
     Synchronizer* _synchronizer;

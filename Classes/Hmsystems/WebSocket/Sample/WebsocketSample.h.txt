@@ -1,0 +1,32 @@
+#ifndef __war__WebsocketSample__
+#define __war__WebsocketSample__
+
+#include "cocos2d.h"
+
+USING_NS_CC;
+
+class Synchronizer;
+class WebsocketSampleChara;
+
+class WebsocketSample : public Layer{
+public:
+
+    CREATE_FUNC(WebsocketSample);
+private:
+    virtual bool init();
+    void onEnter();
+    
+    void setClone();
+    
+    //synchronizerに渡すコールバック関数
+    void onConnectionCallback(Synchronizer* synchronizer);
+    void onDisconnectionCallback(Synchronizer* synchronizer);
+    void onErrorCallback(Synchronizer* synchronizer);
+    
+    //メンバ変数にSynchronizerを持たせる
+    Synchronizer* _synchronizer;
+    WebsocketSampleChara* _chara;
+};
+
+
+#endif /* defined(__war__WebsocketSample__) */

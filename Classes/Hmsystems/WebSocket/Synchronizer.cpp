@@ -11,9 +11,9 @@ using namespace json11;
 
 Synchronizer* Synchronizer::create(Node* parent, std::string url, std::string port,
                                    float syncFps,
-                                   function<void()> onConnectionFunc,
-                                   function<void()> onErrorFunc,
-                                   function<void()> onDisconnectionFunc){
+                                   const function<void(Synchronizer*)>& onConnectionFunc,
+                                   const function<void(Synchronizer*)>& onErrorFunc,
+                                   const function<void(Synchronizer*)>& onDisconnectionFunc){
     Synchronizer *node = new Synchronizer();
     
     if (node && node->init(parent, url, port, syncFps, onConnectionFunc,
@@ -27,9 +27,9 @@ Synchronizer* Synchronizer::create(Node* parent, std::string url, std::string po
 
 bool Synchronizer::init(Node* parent, std::string url, std::string port,
                         float syncFps,
-                        function<void()> onConnectionFunc,
-                        function<void()> onErrorFunc,
-                        function<void()> onDisconnectionFunc){
+                        const function<void(Synchronizer*)>& onConnectionFunc,
+                        const function<void(Synchronizer*)>& onErrorFunc,
+                        const function<void(Synchronizer*)>& onDisconnectionFunc){
     if(!Node::init()) return false;
     HMSLOG("Synchronizer::init()");
     _parent = parent;
@@ -241,7 +241,7 @@ void Synchronizer::onRecieveEvent(SIOClient* client, const string& data){
         _cached_commands.push_back(commands[index]);
         index++;
     }
-    
+    processCachedCommands(10);
 }
 
 string Synchronizer::convertToJsonCommand(string commandType, string id,
@@ -280,7 +280,7 @@ Synchronizer::ConnectionState Synchronizer::getConnectionState() const{
 void Synchronizer::onConnect(SIOClient *client){
     HMSLOG("#####socketIO::connection success!!");
     _connection_state = kOpen;
-    _on_connection_func();
+    _on_connection_func(this);
 }
 
 void Synchronizer::onMessage(SIOClient* client, const std::string& data){
@@ -290,10 +290,10 @@ void Synchronizer::onMessage(SIOClient* client, const std::string& data){
 void Synchronizer::onClose(SIOClient* client){
     HMSLOG("#####socketIO::disconnection success!!");
     _connection_state = kClosed;
-    _on_disconnection_func();
+    _on_disconnection_func(this);
 }
 
 void Synchronizer::onError(SIOClient* client, const std::string& data){
     HMSLOG("#####socketIO::failed... :  %s", data.c_str());
-    _on_error_func();
+    _on_error_func(this);
 }

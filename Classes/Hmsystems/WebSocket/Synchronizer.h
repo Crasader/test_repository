@@ -31,14 +31,14 @@ class Synchronizer : public Node, public SocketIO::SIODelegate{
     
     static Synchronizer* create(Node* parent, std::string url, std::string port,
                                 float syncFps,
-                                function<void()> onConnectionFunc,
-                                function<void()> onErrorFunc,
-                                function<void()> onDisconnectionFunc);
+                                const function<void(Synchronizer*)>& onConnectionFunc,
+                                const function<void(Synchronizer*)>& onErrorFunc,
+                                const function<void(Synchronizer*)>& onDisconnectionFunc);
     virtual bool init(Node* parent, std::string url, std::string port,
                       float syncFps,
-                      function<void()> onConnectionFunc,
-                      function<void()> onErrorFunc,
-                      function<void()> onDisconnectionFunc);
+                      const function<void(Synchronizer*)>& onConnectionFunc,
+                      const function<void(Synchronizer*)>& onErrorFunc,
+                      const function<void(Synchronizer*)>& onDisconnectionFunc);
     
     void connectionStart();
     void send(SynchronizedObject* synchronizedObject,
@@ -71,9 +71,9 @@ class Synchronizer : public Node, public SocketIO::SIODelegate{
     SIOClient* _client;
     Node* _parent;
     SynchronizedObjectCreater* _synchronized_object_creater;
-    function<void()> _on_connection_func;
-    function<void()> _on_error_func;
-    function<void()> _on_disconnection_func;
+    function<void(Synchronizer*)> _on_connection_func;
+    function<void(Synchronizer*)> _on_error_func;
+    function<void(Synchronizer*)> _on_disconnection_func;
     
     std::string _url;
     std::string _port;

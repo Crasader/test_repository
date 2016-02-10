@@ -1,0 +1,44 @@
+#include "WebsocketSample.h"
+#include "Synchronizer.h"
+#include "WebSocketSampleChara.h"
+
+bool WebsocketSample::init(){
+    if(Layer::init()) return false;
+    
+    //SynchronizerをCreate(自身, URL, ポート番号, 送信頻度, 接続成功時のコールバック, 接続失敗時のコールバック, 接続切断時のコールバック)
+    _synchronizer = Synchronizer::create(this, "接続先のURL", "ポート番号", 60.0f,
+                       CC_CALLBACK_1(WebsocketSample::onConnectionCallback, this),
+                       CC_CALLBACK_1(WebsocketSample::onErrorCallback, this),
+                       CC_CALLBACK_1(WebsocketSample::onDisconnectionCallback, this));
+    
+    this->addChild(_synchronizer);
+    
+    //リモートで生成するSynchronizedObjectのprtotypeを登録する(必須)
+    setClone();
+    
+    
+    _synchronizer->connectionStart();
+    
+    return true;
+}
+
+void WebsocketSample::onEnter(){
+    Layer::onEnter();
+    
+    //sampleCharaの生成
+    _chara = WebsocketSampleChara::createLocal("画像のpath", _synchronizer);
+    this->addChild(this);
+    //Synchronizerに同期するオブジェクトを追加する（必須）
+    _synchronizer->add(_chara);
+    /*
+     これで_charaはWebsocketSampleChara::onSendやonReceiveで設定した通りに同期されます
+     */
+}
+
+void WebsocketSample::setClone(){
+    //リモートで生成できるようにWebsocketSampleCharaを登録
+    _synchronizer->addSynchronizedObjectCreater(WebsocketSampleChara::createProtoType(_synchronizer));
+}
+
+
+

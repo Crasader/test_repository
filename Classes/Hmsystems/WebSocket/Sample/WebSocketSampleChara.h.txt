@@ -1,0 +1,40 @@
+#ifndef __war__WebSocketSampleChara__
+#define __war__WebSocketSampleChara__
+
+#include "SynchronizedObject.h"
+#include "cocos2d.h"
+
+USING_NS_CC;
+
+//Websocketで同期を取りたいものはSynchronizedObjectを継承する
+class WebsocketSampleChara : public SynchronizedObject{
+public:
+    //リモートでcloneするのに必要な情報だけを登録するためのCreateメソッド
+    static WebsocketSampleChara* createPrototype(Synchronizer* synchronizer);
+    //ローカルで使うcreate
+    static WebsocketSampleChara* createLocal(std::string path,Synchronizer* synchronizer);
+    //リモートで使うcreate
+    static WebsocketSampleChara* createRemote(std::string path,Synchronizer* synchronizer,bool isLocal, std::string id);
+    
+    static WebsocketSampleChara* create(std::string path,Synchronizer* synchronizer,
+                                      bool isLocal, std::string id);
+    virtual bool init(std::string path, Synchronizer* synchronizer,
+                      bool isLocal, std::string id);
+    //protoType用のinit
+    virtual bool init(Synchronizer* synchronizer);
+private:
+    //------SynchronizedObjectの純粋仮想関数の実装------
+    virtual void onSend();
+    virtual void onReceive(MultiValue* value);
+    virtual SynchronizedObject* onClone(MultiValue* value, std::string id,
+                                        Synchronizer* synchronizer);
+    //ローカル側の更新処理
+    virtual void onLocalUpdate(float delta);
+    //リモート側の更新処理
+    virtual void onRemoteUpdate(float delta);
+    //--SynchronizedObjectの純粋仮想関数の実装ここまで--
+   
+    void onEnter(); //初期実行関数
+};
+
+#endif /* defined(__war__WebSocketSampleChara__) */

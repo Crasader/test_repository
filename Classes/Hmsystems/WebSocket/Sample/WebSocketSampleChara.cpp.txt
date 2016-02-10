@@ -1,0 +1,96 @@
+#include "WebSocketSampleChara.h"
+#include "MultiValue.h"
+#include "PrimitiveParser.h"
+#include "HmsConsoleUtil.h"
+
+using namespace std;
+
+//リモートでcloneするのに必要な情報だけを登録するためのCreateメソッド
+static WebsocketSampleChara* createPrototype(Synchronizer* synchronizer){
+    return create("", synchronizer, false, "");
+}
+//ローカルで使うcreate
+static WebsocketSampleChara* createLocal(std::string path,Synchronizer* synchronizer){
+    return create(path, synchronizer, true, "");
+}
+//リモートで使うcreate
+static WebsocketSampleChara* createRemote(std::string path,Synchronizer* synchronizer,bool isLocal, std::string id){
+    return create(path, synchronizer, false, id);
+}
+
+
+//通常のcreateメソッド Synchronizer* synchronizer,bool isLocal, string id は必須
+WebsocketSampleChara* WebsocketSampleChara::create(string path, Synchronizer* synchronizer,bool isLocal, string id){
+    WebsocketSampleChara *sprite = new WebsocketSampleChara();
+    if (sprite && sprite->init(path, synchronizer, isLocal, id))
+    {
+        sprite->autorelease();
+        return sprite;
+    }
+    CC_SAFE_DELETE(sprite);
+    return nullptr;
+}
+
+bool WebsocketSampleChara::init(string path, Synchronizer* synchronizer, bool isLocal, string id){
+    if (!SynchronizedObject::init(isLocal, synchronizer, "WebSocketTestChara", id) ) {
+        return false;
+    }
+    //リモートが作成する際に必要な引数を登録する
+    _add_network_args->push(path);
+    
+    Sprite* sprite = Sprite::create(path);
+    this->addChild(sprite);
+    return true;
+}
+
+bool WebsocketSampleChara::init(Synchronizer* synchronizer){
+    //リモートが作成する際に必要なクラス名の登録
+    if (!SynchronizedObject::init(false, synchronizer, "WebSocketTestChara") ) {
+        return false;
+    }
+    return true;
+}
+
+void WebsocketSampleChara::onEnter(){
+    SynchronizedObject::onEnter();
+}
+
+//送信する値を設定
+void WebsocketSampleChara::onSend(){
+    MultiValue* multiValue = MultiValue::create();
+    multiValue->push(getPosition());
+    multiValue->push(1.5f);
+    multiValue->push(getScale());
+    
+    send(multiValue);
+}
+
+//受信した時の挙動を設定
+void WebsocketSampleChara::onReceive(MultiValue* value){
+    //multiValueは送信する際にpushした順番に取得できる
+    //上の例だとgetPositionの値、1.5f、getScaleの値の順番で取得する
+    Vec2 vec = PrimitiveParser::asVec2(value->pop().value);
+    setPosition(vec);
+    
+    float f = PrimitiveParser::asFloat(value->pop().value);
+    
+    float scale = PrimitiveParser::asFloat(value->pop().value);
+}
+
+//リモートでクローンするときの挙動を設定
+SynchronizedObject* WebsocketSampleChara::onClone(MultiValue* value, std::string id,
+                                                Synchronizer* synchronizer){
+    string path = value->pop().value;
+    WebsocketSampleChara* clone = createRemote(path, synchronizer, false, id);
+    return clone;
+}
+
+//ローカル時の挙動の設定
+void WebsocketSampleChara::onLocalUpdate(float delta){
+    
+}
+
+//リモート時の挙動の設定
+void WebsocketSampleChara::onRemoteUpdate(float delta){
+    
+}

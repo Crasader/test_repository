@@ -40,9 +40,9 @@ bool WebSocketTestLayer::init()
     };
     
     
-    _synchronizer = Synchronizer::create(this, "http://192.168.100.112", "3000", 60.0f,
+/*    _synchronizer = Synchronizer::create(this, "http://192.168.100.112", "3000", 60.0f,
                                          onConnectionFunc, onErrorFunc,
-                                         onDisconnectionFunc);
+                                         onDisconnectionFunc);*/
     this->addChild(_synchronizer);
     //clone用オブジェクトの登録
     _synchronizer->
@@ -60,9 +60,11 @@ void WebSocketTestLayer::onEnter()
     initEventListener();
     
     Sprite* bg = Sprite::create("init/Home/Mypage/back.png");
-    bg->setAnchorPoint(Vec2::ZERO);
-    bg->setPosition(Vec2::ZERO);
-    bg->setScale(ratio);
+    bg->setPosition(convertFromDisplaySize(Vec2(320, 480), 0.5f, 0.5f));
+    
+    float myDisplaySizeY = Director::getInstance()->getVisibleSize().height;
+    float y = (myDisplaySizeY / 960);
+    bg->setScale(1, y);
     this->addChild(bg);
     
     _test_chara = WebsocketTestChara::create("init/CharaMenu/icon_offense3.png", _synchronizer, true);
